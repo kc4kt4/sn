@@ -21,6 +21,6 @@ public class UserController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomPage<User> find(@RequestParam(defaultValue = "0") final int page,
                                  @RequestParam(defaultValue = "10") final int count) {
-        return service.find(page, count);
+        return service.findByUserName(page, count);
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @AllArgsConstructor
 public class UserEntryRepositoryImpl implements UserEntryRepository {
@@ -21,5 +23,10 @@ public class UserEntryRepositoryImpl implements UserEntryRepository {
     @Override
     public @NotNull Page<UserEntry> find(final @NotNull PageRequest request) {
         return repository.findAll(request);
+    }
+
+    @Override
+    public @NotNull Optional<UserEntry> find(@NotNull final String userName) {
+        return repository.findByUserName(userName);
     }
 }
