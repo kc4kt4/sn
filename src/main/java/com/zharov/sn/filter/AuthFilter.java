@@ -19,6 +19,9 @@ import java.io.IOException;
 @Component
 @AllArgsConstructor
 public class AuthFilter implements Filter {
+    private static final String BASIC_HEADER = "X-Basic";
+    private static final String USER_NAME_HEADER = "X-UserName";
+    private static final String TOKEN_HEADER = "X-Token";
     private final UserService userService;
 
     @Override
@@ -38,8 +41,8 @@ public class AuthFilter implements Filter {
     }
 
     private void doAuth(final @NotNull HttpServletRequest httpRequest, final @NotNull HttpServletResponse httpResponse) {
-        final String userName = httpRequest.getHeader("X-UserName");
-        final String basic = httpRequest.getHeader("X-Basic");
+        final String userName = httpRequest.getHeader(USER_NAME_HEADER);
+        final String basic = httpRequest.getHeader(BASIC_HEADER);
 
         if (userName.equals("andrey-admin")) {
             return;
@@ -69,10 +72,10 @@ public class AuthFilter implements Filter {
             }
 
             final String token = DigestUtils.sha256Hex(user.getUserName() + user.getEmail());
-            httpResponse.setHeader("X-Token", token);
+            httpResponse.setHeader(TOKEN_HEADER, token);
 
         } else if (!httpRequest.getRequestURI().contains("/logout")) {
-            final String token = httpRequest.getHeader("X-Token");
+            final String token = httpRequest.getHeader(TOKEN_HEADER);
             final User user = userService.findByUserName(userName)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
 
