@@ -44,7 +44,7 @@ public class AuthFilter implements Filter {
         final String userName = httpRequest.getHeader(USER_NAME_HEADER);
         final String basic = httpRequest.getHeader(BASIC_HEADER);
 
-        if (userName.equals("andrey-admin")) {
+        if ("andrey-admin".equals(userName)) {
             return;
         }
 

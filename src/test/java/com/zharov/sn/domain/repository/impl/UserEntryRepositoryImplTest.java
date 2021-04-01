@@ -1,10 +1,9 @@
-package com.zharov.sn.impl;
+package com.zharov.sn.domain.repository.impl;
 
+import com.zharov.sn.AbstractMongoDBContainer;
 import com.zharov.sn.domain.entry.UserEntry;
 import com.zharov.sn.domain.repository.impl.UserEntryRepositoryImpl;
 import org.assertj.core.api.Assertions;
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,35 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Testcontainers
-class UserEntryRepositoryImplTest {
-    @Container
-    static final MongoDBContainer MONGO = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
-
+class UserEntryRepositoryImplTest extends AbstractMongoDBContainer {
     @Autowired
     MongoTemplate mongoTemplate;
     @Autowired
     UserEntryRepositoryImpl repository;
-
-    @DynamicPropertySource
-    static void registerPgProperties(final @NotNull DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", MONGO::getReplicaSetUrl);
-    }
-
-    @BeforeAll
-    static void mongoUp() {
-        Assertions.assertThat(MONGO.isRunning())
-                .isTrue();
-    }
 
     @BeforeEach
     void setUp() {
