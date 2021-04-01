@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,7 +74,7 @@ class UserEntryRepositoryImplTest {
     }
 
     @Test
-    void find() {
+    void findAll() {
         final UserEntry entry = new UserEntry()
                 .setUserName("userName")
                 .setPwd("pwd")
@@ -91,5 +92,11 @@ class UserEntryRepositoryImplTest {
                 .hasSize(1)
                 .element(0)
                 .isEqualTo(saved);
+    }
+
+    @Test
+    @Disabled("notImplemented")
+    void find() {
+
     }
 }

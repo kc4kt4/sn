@@ -9,6 +9,7 @@ import com.zharov.sn.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public @NotNull CustomPage<User> find(final int page, final int count) {
+    public @NotNull CustomPage<User> findByUserName(final int page, final int count) {
         final PageRequest pageRequest = PageRequest.of(page, count);
         final Page<UserEntry> entries = repository.find(pageRequest);
 
@@ -47,5 +48,11 @@ public class UserServiceImpl implements UserService {
                 .setPage(page)
                 .setTotalElements(entries.getTotalElements())
                 .setTotalPages(entries.getTotalPages());
+    }
+
+    @Override
+    public @NotNull Optional<User> findByUserName(final @NotNull String userName) {
+        return repository.find(userName)
+                .map(mapper::toDto);
     }
 }

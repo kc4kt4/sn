@@ -8,13 +8,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 
@@ -23,18 +23,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ContextConfiguration(classes = {UserController.class})
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
-@WebMvcTest
+@ContextConfiguration(classes = {UserController.class})
 class UserControllerTest {
-    @Autowired
     MockMvc mockMvc;
+    @Autowired
+    UserController controller;
     @MockBean
     UserService service;
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(controller)
+                .setControllerAdvice(new ControllerAdviceExceptionHandler())
+                .build();
+
         reset(service);
     }
 
@@ -68,7 +73,7 @@ class UserControllerTest {
                 .setContent(Arrays.asList(user1, user2, user3))
                 .setTotalElements(5)
                 .setTotalPages(2);
-        when(service.find(0, 5)).thenReturn(page);
+        when(service.findByUserName(0, 5)).thenReturn(page);
 
         //test
         mockMvc.perform(get("/users")
@@ -82,6 +87,6 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.content[1].userName").value("uName2"))
                 .andExpect(jsonPath("$.content[2].userName").value("uName3"));
 
-        verify(service, times(1)).find(0, 5);
+        verify(service, times(1)).findByUserName(0, 5);
     }
 }

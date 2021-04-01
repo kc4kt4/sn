@@ -47,6 +47,11 @@ class UserServiceImplTest {
 
     @Test
     @Disabled("notImplemented")
+    void findAll() {
+    }
+
+    @Test
+    @Disabled("notImplemented")
     void find() {
     }
 }
