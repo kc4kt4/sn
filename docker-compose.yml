@@ -10,8 +10,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - 27017:27017
-    networks:
-      - shared-net
 
   sn:
     image: vasilevskijifree/sn
@@ -19,9 +17,3 @@ services:
       - "8081:8081"
     depends_on:
       - "mongo"
-    networks:
-      - shared-net
-
-networks:
-  shared-net:
-    driver: bridge
