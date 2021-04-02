@@ -1,6 +1,7 @@
 version: '3.1'
 
 services:
+
   mongo:
     image: mongo
     restart: always
@@ -9,3 +10,18 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - 27017:27017
+    networks:
+      - shared-net
+
+  sn:
+    image: vasilevskijifree/sn
+    ports:
+      - "8081:8081"
+    depends_on:
+      - "mongo"
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    driver: bridge
