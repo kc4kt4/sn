@@ -15,10 +15,14 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @AllArgsConstructor
 public class AuthFilter implements Filter {
+    private static final String BASIC_HEADER = "X-Basic";
+    private static final String USER_NAME_HEADER = "X-UserName";
+    private static final String TOKEN_HEADER = "X-Token";
     private final UserService userService;
 
     @Override
@@ -32,16 +36,30 @@ public class AuthFilter implements Filter {
             doAuth(httpRequest, httpResponse);
         } catch (ResponseStatusException e) {
             httpResponse.setStatus(e.getStatus().value());
+        } catch (Exception e) {
+            httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         chain.doFilter(request, response);
     }
 
     private void doAuth(final @NotNull HttpServletRequest httpRequest, final @NotNull HttpServletResponse httpResponse) {
-        final String userName = httpRequest.getHeader("X-UserName");
-        final String basic = httpRequest.getHeader("X-Basic");
+        final String userName = httpRequest.getHeader(USER_NAME_HEADER);
+        final String basic = httpRequest.getHeader(BASIC_HEADER);
 
-        if (userName.equals("andrey-admin")) {
+        if ("andrey-admin".equals(userName)) {
+            return;
+        }
+
+        if (Arrays.asList(
+                "/v3/api-docs",
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui",
+                "/swagger",
+                "/webjars/**").stream()
+                .anyMatch(e -> httpRequest.getRequestURI().contains(e))) {
             return;
         }
 
@@ -69,10 +87,10 @@ public class AuthFilter implements Filter {
             }
 
             final String token = DigestUtils.sha256Hex(user.getUserName() + user.getEmail());
-            httpResponse.setHeader("X-Token", token);
+            httpResponse.setHeader(TOKEN_HEADER, token);
 
         } else if (!httpRequest.getRequestURI().contains("/logout")) {
-            final String token = httpRequest.getHeader("X-Token");
+            final String token = httpRequest.getHeader(TOKEN_HEADER);
             final User user = userService.findByUserName(userName)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
 
