@@ -15,6 +15,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @AllArgsConstructor
@@ -35,6 +36,8 @@ public class AuthFilter implements Filter {
             doAuth(httpRequest, httpResponse);
         } catch (ResponseStatusException e) {
             httpResponse.setStatus(e.getStatus().value());
+        } catch (Exception e) {
+            httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         chain.doFilter(request, response);
@@ -45,6 +48,18 @@ public class AuthFilter implements Filter {
         final String basic = httpRequest.getHeader(BASIC_HEADER);
 
         if ("andrey-admin".equals(userName)) {
+            return;
+        }
+
+        if (Arrays.asList(
+                "/v3/api-docs",
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui",
+                "/swagger",
+                "/webjars/**").stream()
+                .anyMatch(e -> httpRequest.getRequestURI().contains(e))) {
             return;
         }
 
